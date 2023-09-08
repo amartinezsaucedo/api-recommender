@@ -16,6 +16,7 @@ ruamel-yaml = "^0.17.32"
 spacy = "^3.6.0"
 nltk = "^3.8.1"
 pandas = "^2.0.3"
+flask-cors = "^4.0.0"
 
 
 [build-system]

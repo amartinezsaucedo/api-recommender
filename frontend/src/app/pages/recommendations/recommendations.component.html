@@ -1,0 +1,13 @@
+  <form (ngSubmit)="onSubmit()" [formGroup]="queryForm" class="container">
+   <div class="search-container">
+    <mat-form-field class="search">
+      <mat-label for="query">Query:</mat-label>
+      <input formControlName="query" id="query" matInput type="text" >
+    </mat-form-field>
+    <app-model-selector (sendAlgorithmEmitter)="getAlgorithm($event)"
+                        (sendModelEmitter)="getModel($event)"></app-model-selector>
+    <button [disabled]="!queryForm.valid || loading" color="primary" mat-fab type="submit"> <mat-icon>search</mat-icon></button>
+   </div>
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+    <app-recommendation-list [recommendations]="recommendations.recommendations" [query]="queryValue" [metadata]="recommendations.metadata"></app-recommendation-list>
+  </form>

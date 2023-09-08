@@ -1,0 +1,28 @@
+<form [formGroup]="modelForm">
+  <mat-form-field appearance="fill" class="input-select">
+    <mat-label>Algorithm</mat-label>
+    <mat-select
+      (selectionChange)="setAlgorithm($event)"
+      [formControl]="algorithm"
+      name="algorithm"
+
+    >
+      <mat-option *ngFor="let a of algorithms" [value]="a.algorithm">
+        {{ a.algorithm }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="fill" class="input-select">
+    <mat-label>Model</mat-label>
+    <mat-select
+      (selectionChange)="setModel($event)"
+      [formControl]="model"
+      name="model"
+      class="input-select"
+    >
+      <mat-option *ngFor="let m of models" [value]="m">
+        {{ m }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</form>

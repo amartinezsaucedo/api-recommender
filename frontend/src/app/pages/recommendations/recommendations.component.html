@@ -9,5 +9,5 @@
     <button [disabled]="!queryForm.valid || loading" color="primary" mat-fab type="submit"> <mat-icon>search</mat-icon></button>
    </div>
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
-    <app-recommendation-list [recommendations]="recommendations.recommendations" [query]="queryValue" [metadata]="recommendations.metadata"></app-recommendation-list>
+    <app-recommendation-list [recommendations]="recommendations.recommendations" [query]="queryValue" [metadata]="metadata"></app-recommendation-list>
   </form>

@@ -7,7 +7,7 @@ import {Recommendations} from "../../models/recommendations";
   selector: 'app-recommendations',
   templateUrl: './recommendations.component.html',
   styleUrls: ['./recommendations.component.sass'],
-  providers: [RecommendationService],
+  providers: [RecommendationService, APIService],
 })
 export class RecommendationsComponent {
   queryForm = new FormGroup({
@@ -16,8 +16,10 @@ export class RecommendationsComponent {
     model: new FormControl('', Validators.required)
   });
   loading = false;
-  private service = inject(RecommendationService);
+  private recommendationService = inject(RecommendationService);
+  private metadataService = inject(APIService);
   recommendations: Recommendations = new Recommendations();
+  metadata: Metadata = new Metadata();
   queryValue: string = ""
 
   get query() {
@@ -36,11 +38,14 @@ export class RecommendationsComponent {
     this.loading = true;
     this.recommendations = new Recommendations();
     this.queryValue = <string>this.query?.value;
-    this.service.getRecommendations(<string>this.query?.value, <string>this.algorithm?.value, <string>this.model?.value)
+    this.metadataService.getDatasetInfo().subscribe(metadata => {
+      this.metadata = metadata;
+    });
+    this.recommendationService.getRecommendations(<string>this.query?.value, <string>this.algorithm?.value, <string>this.model?.value, <number>this.k?.value)
       .subscribe(recommendations => {
         this.loading = false;
         this.recommendations = recommendations;
-      })
+      });
   }
 
   getAlgorithm(value: string) {

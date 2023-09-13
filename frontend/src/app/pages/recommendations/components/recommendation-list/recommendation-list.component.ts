@@ -1,4 +1,6 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Metadata} from "../../../../models/metadata";
+import {ifChanged} from "../../../../utils/props";
 
 @Component({
   selector: 'app-recommendation-list',
@@ -8,14 +10,14 @@ import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 export class RecommendationListComponent implements OnChanges{
   @Input() recommendations: string[] = [];
   @Input() query: string = "";
-  @Input() metadata: object = {};
+  @Input() metadata: Metadata = new Metadata();
 
   constructor() {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.recommendations = changes['recommendations'].currentValue;
-    this.query = changes['query'].currentValue;
-    this.metadata = changes['metadata'].currentValue;
+    ifChanged(changes['recommendations'], () => this.recommendations = changes['recommendations'].currentValue);
+    ifChanged(changes['query'], () => this.query = changes['query'].currentValue);
+    ifChanged(changes['metadata'], () => this.metadata = changes['metadata'].currentValue);
   }
 }

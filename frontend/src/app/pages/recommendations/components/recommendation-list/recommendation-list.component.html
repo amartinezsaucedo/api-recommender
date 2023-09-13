@@ -2,8 +2,9 @@
   <mat-card *ngIf="recommendations.length > 0">
     <mat-card-header>
       <mat-card-title>Recommended APIs for search: {{query}}</mat-card-title>
-      <mat-card-subtitle>Model metadata</mat-card-subtitle>
-      <p>{{metadata}}</p>
+      <mat-card-subtitle>
+        <p>APIs.guru dataset commit hash version: {{metadata.commit}}</p>
+      </mat-card-subtitle>
     </mat-card-header>
   </mat-card>
   <mat-list-item *ngFor ="let recommendation of recommendations">

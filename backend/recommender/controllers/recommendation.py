@@ -20,7 +20,7 @@ class RecommendationController:
         api_data = extract_oapi_data()
         (self.preprocessed_api_data, self.api_data_info) = transform_oapi_data(api_data)
 
-    def get_recommendations(self, query: str, model_algorithm: str, model_binary: str):
+    def get_recommendations(self, query: str, model_algorithm: str, model_binary: str, k: int):
         if not (model_algorithm in self._models.keys() and model_binary in self._models[model_algorithm].keys()):
             raise ValueError("Model or algorithm not supported")
         if len(query.strip()) == 0:
@@ -28,4 +28,4 @@ class RecommendationController:
         model = self._models[model_algorithm][model_binary]
         model.initialize(api_info=self.api_data_info, bow_apis=self.preprocessed_api_data,
                          pretrained=True, hyperparameters=None)
-        return model.get_predictions(query)
+        return model.get_predictions(query, k)

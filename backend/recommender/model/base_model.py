@@ -97,7 +97,7 @@ class BaseModel(metaclass=SingletonMeta):
     def _tune_hyperparameters(self, hyperparameters):
         pass
 
-    def get_predictions(self, query):
+    def get_predictions(self, query, k):
         query_bow = list([x for x in query.split() if x in self._model.key_to_index])
         predictions = []
         for api in self._apis_bows.keys():
@@ -105,7 +105,7 @@ class BaseModel(metaclass=SingletonMeta):
                 predictions.append((api, self._model.n_similarity(query_bow, self._apis_bows[api])))
             else:
                 predictions.append((api, 0))
-        return [api[0] for api in sorted(predictions, key=lambda item: -item[1])[0:10]]
+        return [api[0] for api in sorted(predictions, key=lambda item: -item[1])[0:k]]
 
     def evaluate(self, queries_file_path):
         with open(queries_file_path, "r") as file:

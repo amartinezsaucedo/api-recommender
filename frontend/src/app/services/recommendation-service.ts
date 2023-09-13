@@ -11,9 +11,9 @@ export class RecommendationService {
   constructor(private http: HttpClient) {
   }
 
-  getRecommendations(query: string, algorithm: string, model: string): Observable<Recommendations> {
+  getRecommendations(query: string, algorithm: string, model: string, k: number): Observable<Recommendations> {
     return this.http.get<Recommendations>
-    (`${Constants.API_ENDPOINT}${this.recommendationsUrl}?query=${query}&algorithm=${algorithm}&model=${model}`)
+    (`${Constants.API_ENDPOINT}${this.recommendationsUrl}?query=${query}&algorithm=${algorithm}&model=${model}&k=${k}`)
       .pipe(catchError(this.handleError<Recommendations>('getRecommendations', {} as Recommendations)));
   }
 

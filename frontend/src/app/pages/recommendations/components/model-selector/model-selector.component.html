@@ -1,4 +1,8 @@
-<form [formGroup]="modelForm">
+<form>
+  <mat-form-field appearance="fill" class="input-select">
+    <mat-label># recommendations </mat-label>
+    <input type="number" matInput placeholder="10" (ngModelChange)="setK($event)" [formControl]="k">
+  </mat-form-field>
   <mat-form-field appearance="fill" class="input-select">
     <mat-label>Algorithm</mat-label>
     <mat-select

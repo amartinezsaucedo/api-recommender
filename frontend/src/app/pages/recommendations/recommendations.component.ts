@@ -2,6 +2,8 @@ import {Component, inject} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {RecommendationService} from "../../services/recommendation-service";
 import {Recommendations} from "../../models/recommendations";
+import {APIService} from "../../services/api-service";
+import {Metadata} from "../../models/metadata";
 
 @Component({
   selector: 'app-recommendations',
@@ -13,7 +15,8 @@ export class RecommendationsComponent {
   queryForm = new FormGroup({
     query: new FormControl('', Validators.required),
     algorithm: new FormControl('', Validators.required),
-    model: new FormControl('', Validators.required)
+    model: new FormControl('', Validators.required),
+    k: new FormControl(10, Validators.required)
   });
   loading = false;
   private recommendationService = inject(RecommendationService);
@@ -32,6 +35,10 @@ export class RecommendationsComponent {
 
   get model() {
     return this.queryForm.get("model");
+  }
+
+  get k() {
+    return this.queryForm.get("k");
   }
 
   onSubmit() {
@@ -54,5 +61,9 @@ export class RecommendationsComponent {
 
   getModel(value: string) {
     this.queryForm.patchValue({model: value});
+  }
+
+  getK(value: number) {
+    this.queryForm.patchValue({k: value});
   }
 }

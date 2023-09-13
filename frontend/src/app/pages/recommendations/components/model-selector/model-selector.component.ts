@@ -12,23 +12,23 @@ import {Model} from "../../../../models/model";
 export class ModelSelectorComponent implements OnInit {
   models: string[] = [];
   algorithms: Model[] = [];
-  modelForm: FormGroup;
   algorithm: FormControl;
   model: FormControl;
+  k: FormControl;
   @Output()
   sendAlgorithmEmitter: EventEmitter<any> = new EventEmitter();
   @Output()
   sendModelEmitter: EventEmitter<any> = new EventEmitter();
+  @Output()
+  sendKEmitter: EventEmitter<any> = new EventEmitter();
   private service = inject(ModelService);
 
   constructor() {
     this.service.getModels().subscribe(models => this.algorithms = models);
     this.algorithm = new FormControl(null, Validators.required);
     this.model = new FormControl({value: null, disabled: true}, Validators.required);
-    this.modelForm = new FormGroup({
-      algorithm: new FormControl(null, Validators.required),
-      model: new FormControl({value: null, disabled: true}, Validators.required),
-    })
+    this.k = new FormControl(null, Validators.required);
+
   }
 
   ngOnInit(): void {
@@ -49,6 +49,10 @@ export class ModelSelectorComponent implements OnInit {
 
   setAlgorithm(value: any) {
     this.sendAlgorithmEmitter.emit(value.value);
+  }
+
+  setK(value: any) {
+    this.sendKEmitter.emit(value);
   }
 
 }

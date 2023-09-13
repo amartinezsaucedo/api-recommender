@@ -5,7 +5,9 @@
       <input formControlName="query" id="query" matInput type="text" >
     </mat-form-field>
     <app-model-selector (sendAlgorithmEmitter)="getAlgorithm($event)"
-                        (sendModelEmitter)="getModel($event)"></app-model-selector>
+                        (sendModelEmitter)="getModel($event)"
+                        (sendKEmitter)="getK($event)">
+    </app-model-selector>
     <button [disabled]="!queryForm.valid || loading" color="primary" mat-fab type="submit"> <mat-icon>search</mat-icon></button>
    </div>
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>

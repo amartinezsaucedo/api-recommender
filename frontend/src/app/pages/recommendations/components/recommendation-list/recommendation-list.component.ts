@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {Metadata} from "../../../../models/metadata";
 import {ifChanged} from "../../../../utils/props";
+import {Recommendation} from "../../../../models/recommendations";
 
 @Component({
   selector: 'app-recommendation-list',
@@ -8,7 +9,7 @@ import {ifChanged} from "../../../../utils/props";
   styleUrls: ['./recommendation-list.component.sass']
 })
 export class RecommendationListComponent implements OnChanges{
-  @Input() recommendations: string[] = [];
+  @Input() recommendations: Recommendation[] = [];
   @Input() query: string = "";
   @Input() metadata: Metadata = new Metadata();
 

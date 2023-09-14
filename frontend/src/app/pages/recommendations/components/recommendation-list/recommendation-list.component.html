@@ -1,5 +1,5 @@
-<mat-list>
-  <mat-card *ngIf="recommendations.length > 0">
+<div>
+<mat-card *ngIf="recommendations.length > 0" class="info-container">
     <mat-card-header>
       <mat-card-title>Recommended APIs for search: {{query}}</mat-card-title>
       <mat-card-subtitle>
@@ -7,12 +7,18 @@
       </mat-card-subtitle>
     </mat-card-header>
   </mat-card>
-  <mat-list-item *ngFor ="let recommendation of recommendations">
-    <a matLine class="item-container">
-      <mat-icon> chevron_right </mat-icon>
-      <span >{{recommendation}}</span>
-    </a>
+  <div *ngFor ="let recommendation of recommendations">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon> chevron_right </mat-icon>
+          {{recommendation.endpoint}}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <markdown ngPreserveWhitespaces>
+        {{recommendation.description}}
+      </markdown>
+    </mat-expansion-panel>
     <mat-divider></mat-divider>
-  </mat-list-item>
-</mat-list>
-
+  </div>
+</div>

@@ -7,6 +7,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {RecommendationsComponent} from './pages/recommendations/recommendations.component';
 import {ModelSelectorComponent} from './pages/recommendations/components/model-selector/model-selector.component';
+import {RecommendationListComponent} from './pages/recommendations/components/recommendation-list/recommendation-list.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatSelectModule} from "@angular/material/select";
 import {MatFormFieldModule} from "@angular/material/form-field";
@@ -19,7 +20,8 @@ import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatListModule} from "@angular/material/list";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatCardModule} from "@angular/material/card";
-import { RecommendationListComponent } from './pages/recommendations/components/recommendation-list/recommendation-list.component';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MarkdownModule} from 'ngx-markdown';
 
 @NgModule({
   declarations: [
@@ -44,7 +46,9 @@ import { RecommendationListComponent } from './pages/recommendations/components/
     MatProgressBarModule,
     MatListModule,
     MatDividerModule,
-    MatCardModule
+    MatCardModule,
+    MatExpansionModule,
+    MarkdownModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent],

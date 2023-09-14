@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {catchError, Observable, of} from 'rxjs';
 import {Constants} from "../configuration/constants";
-import {Recommendations} from "../models/recommendations";
+import {Recommendation} from "../models/recommendations";
 
 @Injectable()
 export class RecommendationService {
@@ -11,10 +11,10 @@ export class RecommendationService {
   constructor(private http: HttpClient) {
   }
 
-  getRecommendations(query: string, algorithm: string, model: string, k: number): Observable<Recommendations> {
-    return this.http.get<Recommendations>
+  getRecommendations(query: string, algorithm: string, model: string, k: number): Observable<Recommendation[]> {
+    return this.http.get<Recommendation[]>
     (`${Constants.API_ENDPOINT}${this.recommendationsUrl}?query=${query}&algorithm=${algorithm}&model=${model}&k=${k}`)
-      .pipe(catchError(this.handleError<Recommendations>('getRecommendations', {} as Recommendations)));
+      .pipe(catchError(this.handleError<Recommendation[]>('getRecommendations', [] as Recommendation[])));
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

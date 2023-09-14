@@ -1,3 +1,4 @@
-export class Recommendations {
-  recommendations: string[] = [];
+export class Recommendation {
+  endpoint: string = "";
+  description: string = ""
 }

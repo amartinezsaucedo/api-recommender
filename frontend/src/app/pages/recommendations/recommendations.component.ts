@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {RecommendationService} from "../../services/recommendation-service";
-import {Recommendations} from "../../models/recommendations";
+import {Recommendation} from "../../models/recommendations";
 import {APIService} from "../../services/api-service";
 import {Metadata} from "../../models/metadata";
 
@@ -21,7 +21,7 @@ export class RecommendationsComponent {
   loading = false;
   private recommendationService = inject(RecommendationService);
   private metadataService = inject(APIService);
-  recommendations: Recommendations = new Recommendations();
+  recommendations: Recommendation[] = [];
   metadata: Metadata = new Metadata();
   queryValue: string = ""
 
@@ -43,7 +43,7 @@ export class RecommendationsComponent {
 
   onSubmit() {
     this.loading = true;
-    this.recommendations = new Recommendations();
+    this.recommendations = [];
     this.queryValue = <string>this.query?.value;
     this.metadataService.getDatasetInfo().subscribe(metadata => {
       this.metadata = metadata;

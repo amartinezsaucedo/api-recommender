@@ -13,7 +13,7 @@ def recommend():
         algorithm = request.args.get("algorithm")
         model = request.args.get("model")
         k = int(request.args.get("k"))
-        return jsonify({"recommendations": controller.get_recommendations(query, algorithm, model, k)})
+        return jsonify(controller.get_recommendations(query, algorithm, model, k))
     except ValueError as e:
         abort(make_response(jsonify(message=str(e)), 404))
 

@@ -22,13 +22,15 @@ import {MatDividerModule} from "@angular/material/divider";
 import {MatCardModule} from "@angular/material/card";
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MarkdownModule} from 'ngx-markdown';
+import {DatasetUpdateButtonComponent} from './components/dataset-update-button/dataset-update-button.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RecommendationsComponent,
     ModelSelectorComponent,
-    RecommendationListComponent
+    RecommendationListComponent,
+    DatasetUpdateButtonComponent
   ],
   imports: [
     BrowserModule,

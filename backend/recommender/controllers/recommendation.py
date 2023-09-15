@@ -1,6 +1,6 @@
 from backend.recommender.extractor.extract import extract_oapi_data
 from backend.recommender.model import FastTextModel, Word2VecModel
-from backend.recommender.processer.transform import transform_oapi_data, API_INFO_FILE
+from backend.recommender.processer.transform import transform_oapi_data
 
 
 class RecommendationController:
@@ -36,10 +36,10 @@ class RecommendationController:
     def _add_api_description(self, recommendations):
         response = []
         for recommendation in recommendations:
-            response.append({"endpoint": recommendation, "description": self.find_description_for_api(recommendation)})
+            response.append({"endpoint": recommendation, "description": self._find_description_for_api(recommendation)})
         return response
 
-    def find_description_for_api(self, recommendation):
+    def _find_description_for_api(self, recommendation):
         api = [api_info for api_info in list(self.api_data_info.values()) if api_info[0] == recommendation]
         if len(api):
             return api[0][-1]

@@ -9,44 +9,41 @@ from multiprocessing import cpu_count
 
 from .singleton_metaclass import SingletonMeta
 from .utils import recall_at_k, precision_at_k, ndcg_at_k, f1_score_at_k
+from ..persistence.api import Endpoint
 
 
 class BaseModel(metaclass=SingletonMeta):
     _model = None
     _vocab_count = None
-    _apis = None
-    _bow_apis = None
+    _endpoints: list[Endpoint]
     _test = None
     _train = None
     _validation = None
-    _apis_bows = {}
     _initialized = False
 
-    def initialize(self, api_info, bow_apis, pretrained, hyperparameters):
+    def initialize(self, endpoints, pretrained, hyperparameters):
         if not self._initialized:
-            self._apis = api_info
-            self._bow_apis = bow_apis
-            self._load_model(pretrained, hyperparameters, bow_apis)
+            self._endpoints = endpoints
+            self._load_model(pretrained, hyperparameters)
             if pretrained:
                 self._load_api_bows()
             self._initialized = True
 
-    def initialize_evaluation(self, api_bows, pretrained, hyperparameters):
-        self._apis_bows = {}
-        self._load_model(pretrained, hyperparameters, [])
-        for api, bow in api_bows.items():
-            self._apis_bows[api] = [word for word in bow if word in self._model.key_to_index]
+    def initialize_evaluation(self, pretrained, hyperparameters):
+        self._load_model(pretrained, hyperparameters)
+        self._load_api_bows()
 
-    def _load_model(self, pretrained, hyperparameters, bow_apis):
+    def _load_model(self, pretrained, hyperparameters):
         pass
 
     def _load_api_bows(self):
-        for bow, api in zip(self._bow_apis, self._apis.values()):
-            self._apis_bows[api[0]] = [word for word in bow if word in self._model.key_to_index]
+        for endpoint in self._endpoints:
+            endpoint.bow = [word for word in endpoint.bow if word in self._model.key_to_index]
 
-    def train_test_split(self, queries_file_path, target_file_path, test_percentage=0.2, random_state=10, save_test=True):
+    def train_test_split(self, queries_file_path, target_file_path, test_percentage=0.2, random_state=10,
+                         save_test=True):
         random_state = np.random.RandomState(random_state)
-        keys = list(self._apis.keys())
+        keys = [endpoint.id for endpoint in self._endpoints]
         random_state.shuffle(keys)
         train_keys = keys[:int(len(keys) * (1 - test_percentage))]
         test_keys = keys[-int(len(keys) * test_percentage):]
@@ -54,12 +51,14 @@ class BaseModel(metaclass=SingletonMeta):
         test_apis_bows = dict()
         train = []
         for key in train_keys:
-            train_apis_bows.update({key: self._bow_apis[int(key)]})
-            train.append(self._bow_apis[int(key)])
+            value = [endpoint for endpoint in self._endpoints if endpoint.id == key][0]
+            train_apis_bows.update({key: value.endpoint})
+            train.append(value.endpoint)
         if save_test:
             for key in test_keys:
-                api = self._apis[key][0]
-                test_apis_bows[api] = self._bow_apis[int(key)]
+                value = [endpoint for endpoint in self._endpoints if endpoint.id == key][0]
+                api = value.endpoint
+                test_apis_bows[api] = value.bow
             if not os.path.exists(f"{target_file_path}/test.json"):
                 with open(f"{target_file_path}/test.json", "w") as fp:
                     json.dump(test_apis_bows, fp)
@@ -100,11 +99,11 @@ class BaseModel(metaclass=SingletonMeta):
     def get_predictions(self, query, k):
         query_bow = list([x for x in query.split() if x in self._model.key_to_index])
         predictions = []
-        for api in self._apis_bows.keys():
-            if self._apis_bows[api]:
-                predictions.append((api, self._model.n_similarity(query_bow, self._apis_bows[api])))
+        for endpoint in self._endpoints:
+            if len(endpoint.bow) > 0:
+                predictions.append((endpoint, self._model.n_similarity(query_bow, endpoint.bow)))
             else:
-                predictions.append((api, 0))
+                predictions.append((endpoint, 0))
         return [api[0] for api in sorted(predictions, key=lambda item: -item[1])[0:k]]
 
     def evaluate(self, queries_file_path):
@@ -115,7 +114,7 @@ class BaseModel(metaclass=SingletonMeta):
             query_item = item["query"].split()
             ground_truth = item["results"]
             try:
-                final_predictions = self.get_predictions(query_item)
+                final_predictions = self.get_predictions(query_item, 10)
             except KeyError:
                 pass
             else:

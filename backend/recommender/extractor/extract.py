@@ -3,8 +3,9 @@ import requests
 import re
 from pathlib import Path
 import zipfile
-import pickle
 from ruamel.yaml import YAML
+
+from backend.recommender.persistence.api import Endpoint
 
 yaml = YAML()
 
@@ -17,20 +18,16 @@ ERROR_FILENAME = "backend/recommender/data/error.txt"
 
 
 def extract_oapi_data():
-    data_file_exists = os.path.isfile(DATA_FILENAME)
     api_folder_exists = os.path.isdir(APIS_TARGET_FOLDER_NAME)
-    if data_file_exists:
-        data_list = load_list(DATA_FILENAME)
-    else:
-        if not api_folder_exists:
-            download_raw_data()
-            print('Dataset downloaded')
-        print('Processing APIs')
-        data_list = generate_list(DATA_FILENAME, ERROR_FILENAME, APIS_TARGET_FOLDER_NAME)
+    if not api_folder_exists:
+        download_raw_data()
+        print('Dataset downloaded')
+    print('Processing APIs')
+    apis = generate_list(APIS_TARGET_FOLDER_NAME)
     print('APIs loaded')
-    print('Number of APIs: ' + str(len(data_list)))
-    print('Number of endpoints: ' + str(sum(len(api['endpoints'].values()) for api in data_list.values())))
-    return data_list
+    print('Number of APIs: ' + str(len(apis)))
+    print('Number of endpoints: ' + str(len(apis)))
+    return apis
 
 
 def download_raw_data(ref='main', target_folder_name=APIS_TARGET_FOLDER_NAME):
@@ -96,44 +93,24 @@ def save_dataset_commit(commit):
         file.write(commit)
 
 
-def load_list(file):
-    with open(file, 'rb') as fp:
-        itemlist = pickle.load(fp)
-    return itemlist
-
-
-def generate_list(file, error_file, dataset_location):
-    data_list = {}
-    unprocessed_data_list = {}
+def generate_list(dataset_location):
+    apis = []
     accepted_meth = ['post', 'get', 'put', 'patch', 'delete']
-    for base, _, files in os.walk(dataset_location):
+    for absolute_base, _, files in os.walk(dataset_location):
         for f in files:
-            if f == 'swagger.yaml' or f == 'openapi.yaml':
-                API = base.replace(APIS_TARGET_FOLDER_NAME, '')
+            if f in ['swagger.yaml', 'openapi.yaml']:
+                base = absolute_base.replace(APIS_TARGET_FOLDER_NAME, '')
                 try:
-                    with open(os.path.join(base, f), encoding='utf8') as yaml_file:
+                    with open(os.path.join(absolute_base, f), encoding='utf8') as yaml_file:
                         data = yaml.load(yaml_file)
-                    print((API + '/' + f))
-                    data_list[API] = {'description': '', 'endpoints': {}}
-                    if 'info' in data and 'description' in data['info']:
-                        data_list[API]['description'] = data['info']['description']
+                    print((base + '/' + f))
                     for api in data['paths'].keys():
                         for methodHTTP in data['paths'][api].keys():
                             if methodHTTP.lower() in accepted_meth:
-                                data_list[API]['endpoints'][api + '/' + methodHTTP] = ''
                                 if 'description' in list(data['paths'][api][methodHTTP].keys()):
-                                    data_list[API]['endpoints'][api + '/' + methodHTTP] = \
-                                        data['paths'][api][methodHTTP]['description']
+                                    apis.append(Endpoint(endpoint=f"{base}{api}/{methodHTTP}",
+                                                         description=data['paths'][api][methodHTTP]['description']))
                 except Exception as e:
-                    print('Not processed: ' + API + '/' + f)
-                    unprocessed_data_list[API] = {f, e}
+                    print('Not processed: ' + base + '/' + f)
                     pass
-    save_list(error_file, unprocessed_data_list)
-    save_list(file, data_list)
-    return data_list
-
-
-def save_list(file, itemlist):
-    with open(file, 'wb') as fp:
-        pickle.dump(itemlist, fp)
-
+    return apis

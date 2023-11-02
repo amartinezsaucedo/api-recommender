@@ -7,6 +7,7 @@ from datetime import datetime
 
 from backend.recommender.extractor.extract import extract_oapi_data, DATA_FILENAME, APIS_TARGET_FOLDER_NAME, \
     DATASET_COMMIT_FILENAME
+from backend.recommender.persistence.api import Endpoint
 from backend.recommender.processer.transform import transform_oapi_data
 
 
@@ -19,8 +20,11 @@ class APIController:
         except OSError:
             pass
         shutil.rmtree(APIS_TARGET_FOLDER_NAME)
-        api_data = extract_oapi_data()
-        (self.preprocessed_api_data, self.api_data_info) = transform_oapi_data(api_data)
+        Endpoint.objects.delete()
+        endpoints = extract_oapi_data()
+        endpoints = transform_oapi_data(endpoints)
+        Endpoint.objects.insert(endpoints)
+
 
     def get_api_information(self) -> str:
         with open(DATASET_COMMIT_FILENAME) as file:

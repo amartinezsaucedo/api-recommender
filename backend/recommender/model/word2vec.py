@@ -10,12 +10,13 @@ class Word2VecModel(BaseModel):
     def __init__(self, embedding_file_path: str):
         self._embedding_file_path = embedding_file_path
 
-    def _load_model(self, pretrained, hyperparameters, data):
+    def _load_model(self, pretrained, hyperparameters):
+        data = [endpoint.bow for endpoint in self._endpoints]
         if pretrained:
             self._model = KeyedVectors.load_word2vec_format(self._embedding_file_path, binary=True)
             self._model.init_sims()
         elif hyperparameters:
-            self._model = Word2Vec(self._bow_apis, **hyperparameters)
+            self._model = Word2Vec(data, **hyperparameters)
         else:
             self._model = Word2Vec(window=10, sg=1, hs=0,
                                    negative=10,  # for negative sampling

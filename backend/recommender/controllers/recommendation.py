@@ -1,6 +1,6 @@
-from backend.recommender.extractor.extract import extract_oapi_data
+import json
 from backend.recommender.model import FastTextModel, Word2VecModel
-from backend.recommender.processer.transform import transform_oapi_data
+from backend.recommender.persistence.api import Endpoint
 
 
 class RecommendationController:
@@ -18,8 +18,7 @@ class RecommendationController:
     }
 
     def __init__(self):
-        api_data = extract_oapi_data()
-        (self.preprocessed_api_data, self.api_data_info) = transform_oapi_data(api_data)
+        self.apis = Endpoint.objects
 
     def get_recommendations(self, query: str, model_algorithm: str, model_binary: str, k: int):
         if not (model_algorithm in self._models.keys() and model_binary in self._models[model_algorithm].keys()):
@@ -27,20 +26,13 @@ class RecommendationController:
         if len(query.strip()) == 0:
             raise ValueError("A query string must be supplied")
         model = self._models[model_algorithm][model_binary]
-        model.initialize(api_info=self.api_data_info, bow_apis=self.preprocessed_api_data,
-                         pretrained=True, hyperparameters=None)
+        model.initialize(endpoints=self.apis, pretrained=True, hyperparameters=None)
         recommendations = model.get_predictions(query, k)
-        recommendations = self._add_api_description(recommendations)
+        recommendations = self._map_recommendations(recommendations)
         return recommendations
 
-    def _add_api_description(self, recommendations):
+    def _map_recommendations(self, recommendations: list[Endpoint]):
         response = []
         for recommendation in recommendations:
-            response.append({"endpoint": recommendation, "description": self._find_description_for_api(recommendation)})
+            response.append({"endpoint": recommendation.endpoint, "description": recommendation.description})
         return response
-
-    def _find_description_for_api(self, recommendation):
-        api = [api_info for api_info in list(self.api_data_info.values()) if api_info[0] == recommendation]
-        if len(api):
-            return api[0][-1]
-        return self._DEFAULT_DESCRIPTION_VALUE

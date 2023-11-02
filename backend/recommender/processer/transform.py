@@ -7,6 +7,8 @@ from gensim.utils import simple_preprocess
 from gensim.models import Phrases
 from gensim.models.phrases import Phraser
 
+from backend.recommender.persistence.api import Endpoint
+
 LEMMATIZED_APIS_FILE = 'backend/recommender/data/lemmatized_apis.json'
 API_INFO_FILE = 'backend/recommender/data/api_info.json'
 
@@ -73,40 +75,20 @@ def lemmatization(texts, allowed_postags=None):
     return texts_out
 
 
-def transform_oapi_data(data_list):
-    lemmatized_apis_file_exists = os.path.isfile(LEMMATIZED_APIS_FILE)
-    if lemmatized_apis_file_exists:
-        return load_transformed_data()
-    data_list, id_info = get_component_if_both_and_info(data_list)
-    data_list = openapi_preprocess(data_list)
-    data_words = list(sentences_to_words(data_list))
-    data_words_no_stopwords = remove_stopwords(data_words)
+def transform_oapi_data(endpoints: list[Endpoint]):
+    descriptions = [endpoint.description for endpoint in endpoints]
+    descriptions = openapi_preprocess(descriptions)
+    words = list(sentences_to_words(descriptions))
+    bigrams, trigrams = generate_bigrams_and_trigrams(words)
+    words_no_stopwords = remove_stopwords(words)
+    words_trigrams = make_trigrams(trigrams, bigrams, words_no_stopwords)
+    words_lemmatized = lemmatization(words_trigrams)
     lemmatized_apis = []
-    api_info = {}
-    api_id = 0
-    for i in range(len(data_words_no_stopwords)):
-        if data_words_no_stopwords[i] != [] and not data_words_no_stopwords[i] in lemmatized_apis:
-            lemmatized_apis.append(data_words_no_stopwords[i])
-            api_info[api_id] = id_info[i]
-            api_id += 1
-    with open(LEMMATIZED_APIS_FILE, 'w') as fout:
-        json.dump(lemmatized_apis, fout)
-    with open(API_INFO_FILE, 'w') as fout:
-        json.dump(api_info, fout)
-    return lemmatized_apis, api_info
-
-
-def transform_sequence(sequence):
-    data_words = list(sentences_to_words(sequence.split()))
-    bigrams, trigrams = generate_bigrams_and_trigrams(data_words)
-    data_words_no_stopwords = remove_stopwords(data_words)
-    data_words_trigrams = make_trigrams(trigrams, bigrams, data_words_no_stopwords)
-    data_lemmatized = lemmatization(data_words_trigrams)
-    lemmatized_apis = []
-    for i in range(len(data_lemmatized)):
-        if data_lemmatized[i] != [] and not data_lemmatized[i] in lemmatized_apis:
-            lemmatized_apis.append(data_lemmatized[i])
-    return [item for sublist in lemmatized_apis for item in sublist]
+    for i in range(len(words_lemmatized)):
+        if words_lemmatized[i] != [] and not words_lemmatized[i] in lemmatized_apis:
+            lemmatized_apis.append(words_lemmatized[i])
+            endpoints[i].bow = words_lemmatized[i]
+    return endpoints
 
 
 def load_transformed_data():

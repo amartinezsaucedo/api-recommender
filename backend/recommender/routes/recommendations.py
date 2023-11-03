@@ -3,7 +3,7 @@ from backend.recommender.controllers.recommendation import RecommendationControl
 
 recommendations = Blueprint('recommendations', __name__)
 
-controller = RecommendationController()
+controller = RecommendationController.instance()
 
 
 @recommendations.get("/recommendations")

@@ -5,9 +5,9 @@ import time
 import uuid
 from datetime import datetime
 
-from backend.recommender.extractor.extract import extract_oapi_data, DATA_FILENAME, APIS_TARGET_FOLDER_NAME, \
-    DATASET_COMMIT_FILENAME
+from backend.recommender.extractor.extract import extract_oapi_data, APIS_TARGET_FOLDER_NAME
 from backend.recommender.persistence.api import Endpoint
+from backend.recommender.persistence.metadata import Metadata
 from backend.recommender.processer.transform import transform_oapi_data
 
 
@@ -15,14 +15,10 @@ class APIController:
     _tasks = {}
 
     def update_apis(self):
-        try:
-            os.remove(DATA_FILENAME)
-        except OSError:
-            pass
         shutil.rmtree(APIS_TARGET_FOLDER_NAME)
-        Endpoint.objects.delete()
         endpoints = extract_oapi_data()
         endpoints = transform_oapi_data(endpoints)
+        Endpoint.objects.delete()
         Endpoint.objects.insert(endpoints)
 
 

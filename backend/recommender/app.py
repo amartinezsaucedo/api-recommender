@@ -4,13 +4,14 @@ from flask_cors import CORS
 from flask_mongoengine import MongoEngine
 
 from backend.recommender.controllers import APIController
-from backend.recommender.routes.recommendations import recommendations
+from backend.recommender.routes.recommendations import recommendations, controller as recommendations_controller
 from backend.recommender.routes.models import models
 from backend.recommender.routes.dataset import dataset
 
 
 app = Flask(__name__)
-configuration = dotenv_values("backend/.env")
+
+configuration = dotenv_values(".env")
 app.config['MONGODB_SETTINGS'] = {
     "db": configuration["DB_NAME"],
     "host": configuration["ATLAS_URI"]
@@ -24,7 +25,7 @@ app.register_blueprint(dataset, url_prefix="/api/v1")
 
 CORS(app)
 
-api_controller = APIController()
-
 with app.app_context():
+    api_controller = APIController()
     api_controller.clean_tasks(current_app)
+    recommendations_controller.initialize()

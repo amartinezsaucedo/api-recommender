@@ -27,9 +27,7 @@ class APIController:
 
 
     def get_api_information(self) -> str:
-        with open(DATASET_COMMIT_FILENAME) as file:
-            dataset_info = file.readlines()[0]
-        return dataset_info
+        return Metadata.objects().order_by("date").first().dataset_info
 
     def clean_tasks(self, current_app):
         def clean_old_tasks():

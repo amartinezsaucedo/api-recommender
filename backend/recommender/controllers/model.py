@@ -3,7 +3,7 @@ import os
 
 
 class ModelController:
-    _MODELS_DIRECTORY = "backend/recommender/model/pretrained"
+    _MODELS_DIRECTORY = "recommender/recommender/pretrained"
 
     def get_available_models(self):
         available_models = []

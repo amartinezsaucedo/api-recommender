@@ -1,3 +1,4 @@
+import datetime
 import os
 import requests
 import re
@@ -5,16 +6,15 @@ from pathlib import Path
 import zipfile
 from ruamel.yaml import YAML
 
+from backend.recommender.persistence.metadata import Metadata
 from backend.recommender.persistence.api import Endpoint
 
 yaml = YAML()
 
 GITHUB_REPO_URL = 'https://api.github.com/repos/APIs-guru/openapi-directory/{action}/{ref}'
 APIS_SOURCE_FOLDER_NAME = 'APIs/'
-APIS_TARGET_FOLDER_NAME = 'backend/recommender/data/APIs/'
-DATASET_COMMIT_FILENAME = 'backend/recommender/data/dataset_info.txt'
-DATA_FILENAME = "backend/recommender/data/data.txt"
-ERROR_FILENAME = "backend/recommender/data/error.txt"
+APIS_TARGET_FOLDER_NAME = 'recommender/data/APIs/'
+ERROR_FILENAME = "recommender/data/error.txt"
 
 
 def extract_oapi_data():
@@ -89,9 +89,10 @@ def delete_downloaded_zip(filename):
 
 
 def save_dataset_commit(commit):
-    with open(DATASET_COMMIT_FILENAME, 'w') as file:
-        file.write(commit)
-
+    metadata = Metadata()
+    metadata.dataset_info = commit
+    metadata.date = datetime.datetime.now()
+    Metadata.objects.insert(metadata)
 
 def generate_list(dataset_location):
     apis = []

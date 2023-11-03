@@ -9,8 +9,8 @@ from gensim.models.phrases import Phraser
 
 from backend.recommender.persistence.api import Endpoint
 
-LEMMATIZED_APIS_FILE = 'backend/recommender/data/lemmatized_apis.json'
-API_INFO_FILE = 'backend/recommender/data/api_info.json'
+LEMMATIZED_APIS_FILE = 'recommender/data/lemmatized_apis.json'
+API_INFO_FILE = 'recommender/data/api_info.json'
 
 
 def get_component_if_both_and_info(data):

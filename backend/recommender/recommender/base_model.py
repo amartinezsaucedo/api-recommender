@@ -7,7 +7,7 @@ from ray.tune.schedulers import ASHAScheduler
 from ray.tune.stopper import TrialPlateauStopper
 from multiprocessing import cpu_count
 
-from .singleton_metaclass import SingletonMeta
+from backend.recommender.utils.singleton_metaclass import SingletonMeta
 from .utils import recall_at_k, precision_at_k, ndcg_at_k, f1_score_at_k
 from ..persistence.api import Endpoint
 

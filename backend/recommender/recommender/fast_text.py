@@ -1,8 +1,8 @@
 from gensim.models import FastText
 from gensim.models.fasttext import load_facebook_vectors
 
-from backend.recommender.model.base_model import BaseModel
-from backend.recommender.model.utils import RecallAtKLogger
+from backend.recommender.recommender.base_model import BaseModel
+from backend.recommender.recommender.utils import RecallAtKLogger
 
 
 class FastTextModel(BaseModel):

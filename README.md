@@ -1,11 +1,11 @@
 # API Recommender based on Word Embeddings
 
-## Run backend server
+## Install dependencies
 ```shell 
-flask --app backend/recommender/app run
+make install
 ```
 
-## Run frontend
+## Run 
 ```shell 
-cd frontend && ng serve
+make -j2 run
 ```
